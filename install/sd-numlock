@@ -1,0 +1,31 @@
+#!/bin/bash
+
+build() {
+    _add_want() {
+        ln -sf "/usr/lib/systemd/system/$1" "$BUILDROOT/usr/lib/systemd/system/$2.wants/$1"
+    }
+
+    add_binary /usr/bin/bash
+    add_binary /usr/bin/setleds
+
+    cat <<-"EOF" > "$BUILDROOT/usr/lib/systemd/system/numlock.service"
+[Unit]
+Description=Enable numlock on VTs
+Before=cryptsetup-pre.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=bash -c "for vt in /dev/tty[0-6]; do setleds -D +num < $vt; done"
+EOF
+
+    add_systemd_unit cryptsetup-pre.target
+    _add_want numlock.service sysinit.target
+    _add_want cryptsetup-pre.target sysinit.target
+}
+
+help() {
+    cat <<HELPEOF
+This hook enables numlock in early userspace, before sd-encrypt is run.
+HELPEOF
+}
