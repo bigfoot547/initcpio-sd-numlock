@@ -8,7 +8,7 @@ build() {
     add_binary /usr/bin/bash
     add_binary /usr/bin/setleds
 
-    cat <<-"EOF" > "$BUILDROOT/usr/lib/systemd/system/numlock.service"
+    cat <<"EOF" > "$BUILDROOT/usr/lib/systemd/system/numlock.service"
 [Unit]
 Description=Enable numlock on VTs
 Before=cryptsetup-pre.target
